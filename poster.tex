@@ -63,7 +63,7 @@
 %% Abstract ------------------------------------------------------------------
 
 \begin{block}{Abstract \phantom{p}}
-We address the problem of building a classifier that is robust to changes in the data distribution over a continuous family of data generating processes.  Such domain adaptation problems arise in the scientific context when systematic uncertainties define a set of plausible data generating processes, in cases of fairness with respect to continuous attributes, or generally when one desires a classifier to be invariant to changes in a given feature. Robust inference is achieved through building a pivot, a quantity whose distribution does not depend on the unknown values of the nuisance parameter that parameterize the family of data generating processes.  We introduce and derive theoretical results for a training procedure based on adversarial networks for enforcing the pivotal property on a predictive model.
+Aim to build a classifier that is robust to changes in the data distribution over a continuous family of data generating processes.  Such domain adaptation problems arise in the scientific context when systematic uncertainties define a set of plausible data generating processes, in cases of fairness with respect to continuous attributes, or generally when one desires a classifier to be invariant to changes in a given feature. Robust inference is achieved through building a pivot, a quantity whose distribution does not depend on the unknown values of the nuisance parameter that parameterize the family of data generating processes.  We introduce and derive theoretical results for a training procedure based on adversarial networks for enforcing the pivotal property on a predictive model.
 \end{block}
 
 \vspace{0.5cm}
@@ -82,7 +82,7 @@ $z \in \mathcal{Z}$ are the nuisance parameters \\
 %\begin{column}{0.02\textwidth}
 %\end{column}
 \begin{column}{0.48\textwidth}
-\textbf{Goal}: Learn regression function $f : \mathcal{X} \to {\cal S}$ with $\smash{s \in {\cal S} = \mathbb{R}^{|{\cal Y}|}}$ 
+\textbf{\color{red} Goal}: Learn regression function $f : \mathcal{X} \to {\cal S}$ with $\smash{s \in {\cal S} = \mathbb{R}^{|{\cal Y}|}}$ 
 with parameters $\theta_{f}$ that minimize loss ${\cal L}_f(\theta_f)$ (e.g., the cross-entropy) such that\\
 \vspace{0.2cm}
 $p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime )$
@@ -274,11 +274,51 @@ are independent variables. In other words,  the
 optimal classifier $f(\cdot;\smash{\hat\theta}_f)$ is also a pivotal
 quantity. \qedwhite
 
-\vspace{0.3cm}
-
 \end{block}
 
+\vspace{0.3cm}
+\begin{block}{Use in Practice\phantom{p}}
+The assumption of existence of an optimal and pivotal classifier may
+not hold because the nuisance parameter directly shapes the decision boundary.
+In this case, the lower bound is strict: $f$ can either be an optimal classifier or a
+pivotal quantity, but not both simultaneously. In this situation, it is natural
+to rewrite the value function $E$  as
+\begin{align}
+\nonumber E_\lambda(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r) &&\text{\hspace{2.35cm} (5)}
+\end{align}
+where $\lambda \geq 0$ is a hyper-parameter controlling the trade-off between
+the performance of $f$ and its independence with respect to the nuisance
+parameter. Setting $\lambda$ to a large value preferably enforces $f$ to be
+pivotal while setting $\lambda$ close to $0$ constrains $f$ to be
+optimal. 
+\end{block}
+
+\vspace{0.3cm}
 \begin{block}{Illustration \phantom{p}}
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.245\textwidth]{figures/f-plain.pdf}
+        \includegraphics[width=0.245\textwidth]{figures/surface-plain.pdf}
+        \includegraphics[width=0.245\textwidth]{figures/f-adversary.pdf}
+        \includegraphics[width=0.245\textwidth]{figures/surface-adversary.pdf}
+    \end{center}
+
+%    \caption{Toy example.
+%    (Left) Conditional probability densities of the decision scores at $Z=-\sigma, 0, \sigma$
+%        without adversarial training. The resulting densities
+%       are dependent on the continuous parameter $Z$, indicating that $f$ is not pivotal.
+%    (Middle left) The associated decision surface, highlighting
+%       the fact that samples are easier to classify for values of $Z$ above $\sigma$,
+%       hence explaining the dependency.
+%    (Middle right) Conditional probability densities of the decision scores at $Z=-\sigma, 0, \sigma$ when $f$ is
+%       built with adversarial training.
+%       The resulting densities are now almost identical to each other, indicating only a
+%       small dependency on $Z$.
+%    (Right) The associated decision surface, illustrating how adversarial
+%       training bends the decision function vertically to erase the dependency on $Z$.
+%    }
+%    \label{fig:toy}
+\end{figure}
 
 \end{block}
 
@@ -291,28 +331,69 @@ quantity. \qedwhite
 
 \begin{block}{Physics Example \phantom{p}}
 
+\begin{figure}
+\centering
+\begin{minipage}{.46\linewidth}
+    \centering
+        \includegraphics[width=\textwidth]{figures/training.pdf}\vspace{-1em}
+%        \caption{Toy example. Training curves for ${\cal L}_f(\theta_f)$, ${\cal L}_r(\theta_f, \theta_r)$
+%                 and ${\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)$.
+%                 Initialized with a pre-trained classifier $f$, adversarial training was performed for $200$ iterations, mini-batches of size $M=128$, $K=500$ and $\lambda=50$.}
+%        \label{fig:toy-training}
+\end{minipage}
+\hspace{.05\linewidth}
+\begin{minipage}{.46\linewidth}
+    \centering
+        \includegraphics[width=\textwidth]{figures/ams.pdf}\vspace{-1em}
+%        \caption{Physics example. Approximate median significance as a function of the decision threshold
+%                 on the output of $f$. At $\lambda=10$, trading
+%                 accuracy for independence to pileup
+%                 results in a net benefit in terms of statistical significance.}
+%        \label{fig:physics-ams}
+\end{minipage}
+\end{figure}
+
 \end{block}
 
 \vspace{0.5cm}
 \begin{block}{Conclusions \phantom{p}}
 
-{\color{green} \cmark} First step towards understanding variable importances, as computed with a forest of totally randomized trees.
-
-{\color{green} \cmark} Variable importances offer a three-level decomposition of the information provided by the inputs about the output.
-
-{\color{green} \cmark} MDI importances exhibit desirable properties for assessing the relevance of a variable:
 \begin{itemize}
-\item[-] it accounts for all interaction terms, in a fair and exhaustive way;
-\item[-] it is null if and only if the variable is irrelevant;
-\item[-] it depends only on the relevant variables;
+\item[{\color{green} \cmark}] Proposed a flexible learning procedure for building a
+predictive model that is independent of continuous or categorical nuisance
+parameters by jointly training two neural networks in an adversarial fashion.
+
+\item[{\color{green} \cmark}] Motivated the proposed algorithm by showing
+that the minimax value  of its value function corresponds to a predictive model
+that is both optimal and pivotal (if that models exists) or for which one can
+tune the trade-off between power and robustness. 
+
+\item[{\color{green} \cmark}]  Empirically point confirmed the effectiveness of our method on a toy example
+and a particle physics example.
+
 \end{itemize}
 
-{\color{blue} $\Box$} Fully formalize variable importances of actual Random Forests and variants.
+\begin{itemize}
+\item[{\color{blue} $\Box$}] Proposed solution can be used in any situation
+where the training data may not be representative of the real data the
+predictive model will be applied to in practice. 
 
-{\color{blue} $\Box$} Characterize the distribution of variable importances in a finite setting.
+\item[{\color{blue} $\Box$}] In the scientific context, the
+presence of systematic uncertainty can be incorporated by considering a family
+of data generation processes. 
+
+\item[{\color{blue} $\Box$}] The approach also extends to cases where independence of the predictive model with respect to
+observed random variables is desired, as in fairness for
+classification.
+\end{itemize}
 
 
+\line(1,0){525}\\
+KC and GL are both supported through NSF ACI-1450310, additionally KC is supported through PHY-1505463 and PHY-1205376. MK is supported by the US Department of Energy (DOE) under grant DE-AC02-76SF00515 and by the SLAC Panofsky Fellowship. 
 \end{block}
+
+
+
 
 \end{textblock}
 
