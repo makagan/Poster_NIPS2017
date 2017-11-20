@@ -4,7 +4,5 @@ Networks"
 
 NOTE: need --shell-escape option to compile with pdflatex
 
-<p align="center">
-  <img src="../master/poster.pdf" width="350"/>
-</p>
+![Poster](https://github.com/makagan/Poster_NIPS2017/blob/master/poster.pdf)
 
