@@ -4,5 +4,5 @@ Networks"
 
 NOTE: need --shell-escape option to compile with pdflatex
 
-![Poster](https://https://raw.githubusercontent.com/makagan/Poster_NIPS2017/master/poster.pdf)
+![Poster](../master/poster.pdf?raw=true "Title")
 
