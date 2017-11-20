@@ -4,5 +4,3 @@ Networks"
 
 NOTE: need --shell-escape option to compile with pdflatex
 
-![Poster](../master/poster.pdf?raw=true "Title")
-
