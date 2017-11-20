@@ -4,4 +4,7 @@ Networks"
 
 NOTE: need --shell-escape option to compile with pdflatex
 
-![Where things stand now](../master/poster.pdf)
+<p align="center">
+  <img src="../master/poster.pdf" width="350"/>
+</p>
+
