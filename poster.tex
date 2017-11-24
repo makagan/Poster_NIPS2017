@@ -1,11 +1,10 @@
-\documentclass[final]{beamer}
-\usepackage{etex}
+\documentclass[final,unknownkeysallowed]{beamer}
 
 \usetheme{RJH}
 \usepackage[utf8]{inputenc}
 \usepackage[frenchb]{babel}
-\usepackage[orientation=landscape,size=a2,scale=1.2]{beamerposter}
-\usepackage[absolute,overlay]{textpos}
+\usepackage[orientation=landscape,size=a0,scale=2.5]{beamerposter}
+\usepackage[overlay]{textpos}
 \usepackage{url}
 \usepackage{auto-pst-pdf}
 \usepackage{pst-plot}
@@ -23,7 +22,6 @@
 \usepackage{tikz}
  \usetikzlibrary{arrows}
 
-
 \setlength{\TPHorizModule}{\paperwidth}
 \setlength{\TPVertModule}{\paperheight}
 
@@ -37,11 +35,11 @@
 \definecolor{lightgray}{rgb}{0.8,0.8,0.8}
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 
-\title{Learning to Pivot with Adversarial Networks}
+\title{\bf Learning to Pivot with Adversarial Networks \textcolor{red}{\#105}}
 \author{Gilles Louppe, Michael Kagan and Kyle Cranmer\\[1.5ex]
 {\tiny
-\includegraphics[scale=0.16]{images/mail.png}~\url{g.louppe@ulg.ac.be},~\url{makagan@slac.stanford.edu},~\url{kyle.cranmer@nyu.edu} \\[1.5ex]
-\includegraphics[scale=0.18]{images/github.png}~\url{https://github.com/glouppe/paper-learning-to-pivot/}
+\includegraphics[scale=0.3]{images/mail.png}~\url{g.louppe@uliege.be},~\url{makagan@slac.stanford.edu},~\url{kyle.cranmer@nyu.edu} \\[1.5ex]
+\includegraphics[scale=0.35]{images/github.png}~\url{https://github.com/glouppe/paper-learning-to-pivot/}
 }}
 
 \footer{}
@@ -52,22 +50,37 @@
   {\ooalign{$#1\@firstoftwo#2$\cr\hfil$#1\@secondoftwo#2$\hfil\cr}}}
 \makeatother
 
+\renewcommand*{\normalfont}{\relax}
+
 \begin{document}
 \begin{frame}{}
 
 
 %% Column 1 ==================================================================
 
-\begin{textblock}{0.32}(0.01,0.14)
+\begin{textblock}{0.32}(0.0,-0.33)
 
 %% Abstract ------------------------------------------------------------------
 
 \begin{block}{Abstract \phantom{p}}
-Aim to build a classifier that is robust to changes in the data distribution over a continuous family of data generating processes.  Such domain adaptation problems arise in the scientific context when systematic uncertainties define a set of plausible data generating processes, in cases of fairness with respect to continuous attributes, or generally when one desires a classifier to be invariant to changes in a given feature. Robust inference is achieved through building a pivot, a quantity whose distribution does not depend on the unknown values of the nuisance parameter that parameterize the family of data generating processes.  We introduce and derive theoretical results for a training procedure based on adversarial networks for enforcing the pivotal property on a predictive model.
+Several techniques for domain adaptation have been proposed to account for
+differences in the distribution of the data used for training and testing. The
+majority of this work focuses on a binary domain label. Similar problems occur
+in a scientific context where there may be a continuous family of plausible data
+generation processes associated to the presence of systematic uncertainties.
+Robust inference is possible if it is based on a pivot -- a quantity whose
+distribution does not depend on the unknown values of the nuisance parameters
+that parametrize this family of data generation processes. {\color{red} In this work,  we
+introduce and derive theoretical results for a training procedure based on
+adversarial networks for enforcing the pivotal property (or, equivalently,
+fairness with respect to continuous attributes) on a predictive model.} The
+method includes a hyperparameter to control the trade-off between accuracy and
+robustness. We demonstrate the effectiveness of this approach with a toy example
+and examples from particle physics.
 \end{block}
 
 \vspace{0.5cm}
-\begin{block}{Problem Statement \phantom{p}}
+\begin{block}{Problem statement \phantom{p}}
 
 \begin{columns}[t]
 \begin{column}{0.02\textwidth}
@@ -82,10 +95,10 @@ $z \in \mathcal{Z}$ are the nuisance parameters \\
 %\begin{column}{0.02\textwidth}
 %\end{column}
 \begin{column}{0.48\textwidth}
-\textbf{\color{red} Goal}: Learn regression function $f : \mathcal{X} \to {\cal S}$ with $\smash{s \in {\cal S} = \mathbb{R}^{|{\cal Y}|}}$ 
-with parameters $\theta_{f}$ that minimize loss ${\cal L}_f(\theta_f)$ (e.g., the cross-entropy) such that\\
-\vspace{0.2cm}
-$p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime )$
+\textbf{\color{red} Goal}: Learn a classification/regression function $f$
+with parameters $\theta_{f}$ and minimizing a loss ${\cal L}_f(\theta_f)$ (e.g., the cross-entropy) such that
+$$p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime ).$$
+That is {\color{blue} such that $f(X ; \theta_f)$ and $Z$ are independent variables}.
 \end{column}
 \begin{column}{0.02\textwidth}
 \end{column}
@@ -96,38 +109,25 @@ $p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime )$
 \vspace{0.5cm}
 \begin{block}{Method \phantom{p}}
 
-
-
-$r := p_{\theta_r}(z | f(X;\theta_f)=s)$ is the adversary model with parameters $\theta_r$ and loss ${\cal L}_r(\theta_f, \theta_r)$. \\
-As with generative adversarial networks, $f$ and $r$ are trained simultaneously, which is carried out by considering
-the value function
+Let $r := p_{\theta_r}(z | f(X;\theta_f)=s)$ be {\color{red} an adversary model} with
+parameters $\theta_r$ and loss ${\cal L}_r(\theta_f, \theta_r)$. As with
+generative adversarial networks, $f$ and $r$ are trained simultaneously, which
+is carried out by considering the value function
 \begin{align}
-\nonumber E(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - {\cal L}_r(\theta_f, \theta_r)  &&\text{\hspace{2.35cm} (1)}
+E(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - {\cal L}_r(\theta_f, \theta_r)
+\end{align}
+that we optimize by finding the minimax solution
+\begin{align}
+\smash{\hat\theta_f, \hat\theta_r} = \arg \min_{\theta_f} \max_{\theta_r} E(\theta_f, \theta_r).
 \end{align}
 
-that we optimize by finding the minimax solution 
-\begin{align}
-\nonumber \smash{\hat\theta_f, \hat\theta_r} = \arg \min_{\theta_f} \max_{\theta_r} E(\theta_f, \theta_r)&&\text{\hspace{2.75cm} (2)}
-\end{align}
-
-${\cal L}_f$ and ${\cal L}_r$  are respectively set to the
-expected value of the
-negative log-likelihood of $Y|X$ under $f$ and of $Z|f(X;\theta_f)$ under
-$r$: 
-\begin{align}
-    \nonumber {\cal L}_f(\theta_f) &= \mathbb{E}_{x \sim X}  \mathbb{E}_{y \sim Y|x} [ -\log p_{\theta_f} (y|x) ] &\text{(3)}\\
-    \nonumber {\cal L}_r(\theta_f, \theta_r) &= \mathbb{E}_{s \sim f(X;\theta_f)}  \mathbb{E}_{z \sim Z|s} [-\log p_{\theta_r} (z|s)]&\text{(4)}
-\end{align}
-
-
-\vspace{0.2cm}
 \begin{center}
-\tikzstyle{every node}=[font=\fontsize{10}{11.2}]
+\tikzstyle{every node}=[font=\fontsize{25}{11.2}]
 \begin{figure}
-  
+
    \def\layersep{1cm}
 
-   \begin{tikzpicture}[shorten >= 1pt, ->, node distance=\layersep,scale=.8]
+   \begin{tikzpicture}[shorten >= 1pt, ->, node distance=\layersep,scale=1.7]
    \tikzstyle{neuron} = [circle, minimum size=0.25cm, draw=black!20, line width=0.3mm, fill=white]
 
    % Classifier f
@@ -215,18 +215,17 @@ $r$:
    \node[below] at (12.75,-6.5) {${\cal L}_r(\theta_f, \theta_r)$};
 
    \end{tikzpicture}
-   
-%       \caption{\tiny Architecture for the adversarial training of a binary classifier
-%    $f$ against a nuisance parameters $Z$. The adversary $r$ models the
-%    distribution $p(z|f(X;\theta_f)=s)$ of the nuisance parameters as observed only through the output $f(X;\theta_f)$ of the classifier. By
-%    maximizing the antagonistic objective ${\cal L}_r(\theta_f, \theta_r)$, the classifier
-%    $f$ forces $p(z|f(X;\theta_f)=s)$ towards the prior $p(z)$, which happens
-%    when $f(X;\theta_f)$ is  independent of the nuisance parameter $Z$ and therefore pivotal.}
 \end{figure}
-
 
 %}
 \end{center}
+
+{\bf Figure 1.} Architecture for the adversarial training of a binary classifier
+$f$ against a nuisance parameters $Z$. The adversary $r$ models the
+distribution $p(z|f(X;\theta_f)=s)$ of the nuisance parameters as observed only through the output $f(X;\theta_f)$ of the classifier. By
+maximizing the antagonistic objective ${\cal L}_r(\theta_f, \theta_r)$, the classifier
+$f$ forces $p(z|f(X;\theta_f)=s)$ towards the prior $p(z)$, which happens
+when $f(X;\theta_f)$ is  independent of the nuisance parameter $Z$ and therefore pivotal.
 
 \end{block}
 
@@ -236,9 +235,19 @@ $r$:
 
 %% Column 2 ==================================================================
 
-\begin{textblock}{0.32}(0.34,0.14)
+\begin{textblock}{0.32}(0.331,-0.33)
 
-\begin{block}{Theoretical results \phantom{p}}
+\begin{block}{Theoretical motivation \phantom{p}}
+
+Assume that ${\cal L}_f$ and ${\cal L}_r$  are respectively set to the
+expected value of the
+negative log-likelihood of $Y|X$ under $f$ and of $Z|f(X;\theta_f)$ under
+$r$:
+\begin{align}
+    {\cal L}_f(\theta_f) &= \mathbb{E}_{x \sim X}  \mathbb{E}_{y \sim Y|x} [ -\log p_{\theta_f} (y|x) ]  \\
+    {\cal L}_r(\theta_f, \theta_r) &= \mathbb{E}_{s \sim f(X;\theta_f)}  \mathbb{E}_{z \sim Z|s} [-\log p_{\theta_r} (z|s)]
+\end{align}
+
 \begin{shaded}
 \textbf{Proposition 1.}
 \textit{If there exists a minimax solution $(\smash{\hat\theta}_f, \smash{\hat\theta}_r)$
@@ -255,46 +264,48 @@ in which case $p_{\hat{\hat\theta}_r}(z|f(X;\theta_f)=s) = p(z|f(X;\theta_f)=s)$
 ${\cal L}_r \to \mathbb{E}_{s \sim f(X;\theta_f)} [ H({Z|f(X;\theta_f)=s}) ]$;
 
 \item Value function $E$ can be restated as a function of $\theta_f$ only: \\
-$E'(\theta_f) = {\cal L}_f(\theta_f) -  H({Z|f(X;\theta_f)})$; 
+$E'(\theta_f) = {\cal L}_f(\theta_f) -  H({Z|f(X;\theta_f)})$;
 
-\item Have lower bound $H({Y|X}) - H(Z) \leq {\cal L}_f(\theta_f) - H({Z|f(X;\theta_f)})$ \\
+\item We have the lower bound $H({Y|X}) - H(Z) \leq {\cal L}_f(\theta_f) - H({Z|f(X;\theta_f)})$ \\
 where the equality holds at $\smash{\hat\theta}_f = \arg \min_{\theta_f} E'(\theta_f)$ when: \\
  $\sbullet$ $\smash{\hat\theta}_f$ minimizes the negative log-likelihood of $Y|X$ under $f$,
     which happens when $\smash{\hat\theta}_f$ are the parameters
-    of an optimal classifier. Then, ${\cal L}_f$ reduces to 
+    of an optimal classifier. Then, ${\cal L}_f$ reduces to
     minimum value $H({Y|X})$. \\
   $\sbullet$ $\smash{\hat\theta}_f$ maximizes the conditional entropy
     $H({Z|f(X;\theta_f)})$, since $H(Z|f(X;\theta)) \leq H(Z)$.
 \end{enumerate}
 
 
-$\Rightarrow$ By assumption, the lower bound is active, thus we have $H(Z|f(X;\theta_f)) = H(Z)$
-because of the second condition, which happens exactly when $Z$ and $f(X;\theta_f)$
-are independent variables. In other words,  the
-optimal classifier $f(\cdot;\smash{\hat\theta}_f)$ is also a pivotal
-quantity. \qedwhite
+$\Rightarrow$ By assumption, the bound is active, hence $H(Z|f(X;\theta_f)) = H(Z)$
+because of the second condition, which happens when $Z$ and $f(X;\theta_f)$
+are independent variables.
+% In other words,  the
+% optimal classifier $f(\cdot;\smash{\hat\theta}_f)$ is also a pivotal
+% quantity.
+\qedwhite
 
 \end{block}
 
-\vspace{0.3cm}
-\begin{block}{Use in Practice\phantom{p}}
+\vspace{0.2cm}
+\begin{block}{In practice\phantom{p}}
 The assumption of existence of an optimal and pivotal classifier may
 not hold because the nuisance parameter directly shapes the decision boundary.
-In this case, the lower bound is strict: $f$ can either be an optimal classifier or a
-pivotal quantity, but not both simultaneously. In this situation, it is natural
-to rewrite the value function $E$  as
+% In this case, the lower bound is strict: $f$ can either be an optimal classifier or a
+% pivotal quantity, but not both simultaneously.
+In this situation, the value function $E$ can be rewritten  as
 \begin{align}
-\nonumber E_\lambda(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r) &&\text{\hspace{2.35cm} (5)}
+E_\lambda(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)
 \end{align}
 where $\lambda \geq 0$ is a hyper-parameter controlling the trade-off between
 the performance of $f$ and its independence with respect to the nuisance
-parameter. Setting $\lambda$ to a large value preferably enforces $f$ to be
-pivotal while setting $\lambda$ close to $0$ constrains $f$ to be
-optimal. 
+parameter. \\
+- Setting $\lambda$ to a large value preferably enforces $f$ to be pivotal.\\
+- Setting $\lambda$ close to $0$ constrains $f$ to be optimal.
 \end{block}
 
-\vspace{0.3cm}
-\begin{block}{Illustration \phantom{p}}
+\vspace{0.2cm}
+\begin{block}{Toy example \phantom{p}}
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.245\textwidth]{figures/f-plain.pdf}
@@ -302,23 +313,16 @@ optimal.
         \includegraphics[width=0.245\textwidth]{figures/f-adversary.pdf}
         \includegraphics[width=0.245\textwidth]{figures/surface-adversary.pdf}
     \end{center}
-
-%    \caption{Toy example.
-%    (Left) Conditional probability densities of the decision scores at $Z=-\sigma, 0, \sigma$
-%        without adversarial training. The resulting densities
-%       are dependent on the continuous parameter $Z$, indicating that $f$ is not pivotal.
-%    (Middle left) The associated decision surface, highlighting
-%       the fact that samples are easier to classify for values of $Z$ above $\sigma$,
-%       hence explaining the dependency.
-%    (Middle right) Conditional probability densities of the decision scores at $Z=-\sigma, 0, \sigma$ when $f$ is
-%       built with adversarial training.
-%       The resulting densities are now almost identical to each other, indicating only a
-%       small dependency on $Z$.
-%    (Right) The associated decision surface, illustrating how adversarial
-%       training bends the decision function vertically to erase the dependency on $Z$.
-%    }
-%    \label{fig:toy}
 \end{figure}
+
+{\bf Figure 2.}   (Left) Decision scores
+       without adversarial training, showing clear dependence on $Z$
+   (Middle left) Decision surface. Samples are easier to classify for values of $Z$ above $\sigma$.
+   (Middle right) Decision scores with adversarial training.
+      The resulting densities are now almost identical to each other, indicating only a
+      small dependency on $Z$.
+   (Right) Adversarial
+      training reshapes the decision function vertically to erase the dependency on $Z$.
 
 \end{block}
 
@@ -327,31 +331,48 @@ optimal.
 
 %% Column 3 ==================================================================
 
-\begin{textblock}{0.32}(0.67,0.14)
+\begin{textblock}{0.32}(0.662,-0.33)
 
-\begin{block}{Physics Example \phantom{p}}
+\begin{block}{Examples \phantom{p}}
+
+\vspace{-0.8cm}
+\begin{figure}
+\centering
+\begin{minipage}{.42\linewidth}
+    \begin{center}
+        \includegraphics[width=\textwidth]{figures/training.pdf}\vspace{-1em}
+    \end{center}
+    {\bf Figure 3.} Toy example. Training curves for ${\cal L}_f(\theta_f)$, ${\cal L}_r(\theta_f, \theta_r)$
+    and ${\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)$.
+    Initialized with a pre-trained classifier $f$, adversarial training was performed for $200$ iterations, mini-batches of size $M=128$, $K=500$ and $\lambda=50$
+\end{minipage}
+\hspace{.05\linewidth}
+\begin{minipage}{.42\linewidth}
+    \begin{center}
+        \includegraphics[width=\textwidth]{figures/ams.pdf}\vspace{-1em}
+    \end{center}
+        {\bf Figure 4.} Physics example. Approximate median significance as a function of the decision threshold
+        on the output of $f$. At $\lambda=10$, {\color{red} trading
+        accuracy for independence to pileup
+        results in a net benefit in terms of statistical significance}.
+\end{minipage}
+\end{figure}
 
 \begin{figure}
 \centering
-\begin{minipage}{.46\linewidth}
-    \centering
-        \includegraphics[width=\textwidth]{figures/training.pdf}\vspace{-1em}
-%        \caption{Toy example. Training curves for ${\cal L}_f(\theta_f)$, ${\cal L}_r(\theta_f, \theta_r)$
-%                 and ${\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)$.
-%                 Initialized with a pre-trained classifier $f$, adversarial training was performed for $200$ iterations, mini-batches of size $M=128$, $K=500$ and $\lambda=50$.}
-%        \label{fig:toy-training}
+\begin{minipage}{.42\linewidth}
+    \begin{center}
+        \includegraphics[width=\textwidth]{figures/gender-without.pdf}
+    \end{center}
 \end{minipage}
 \hspace{.05\linewidth}
-\begin{minipage}{.46\linewidth}
-    \centering
-        \includegraphics[width=\textwidth]{figures/ams.pdf}\vspace{-1em}
-%        \caption{Physics example. Approximate median significance as a function of the decision threshold
-%                 on the output of $f$. At $\lambda=10$, trading
-%                 accuracy for independence to pileup
-%                 results in a net benefit in terms of statistical significance.}
-%        \label{fig:physics-ams}
+\begin{minipage}{.42\linewidth}
+    \begin{center}
+        \includegraphics[width=\textwidth]{figures/gender-with.pdf}
+    \end{center}
 \end{minipage}
 \end{figure}
+{\bf Figure 5.} Building a fair classifier independent of gender. (Left) Without adversarial training, decision scores depend on gender. (Right) With adversarial training.
 
 \end{block}
 
@@ -359,37 +380,34 @@ optimal.
 \begin{block}{Conclusions \phantom{p}}
 
 \begin{itemize}
-\item[{\color{green} \cmark}] Proposed a flexible learning procedure for building a
+\item[{\color{green} \cmark}] Proposed a flexible learning procedure {\color{red}for building a
 predictive model that is independent of continuous or categorical nuisance
-parameters by jointly training two neural networks in an adversarial fashion.
+parameters} by jointly training two neural networks in an adversarial fashion.
 
-\item[{\color{green} \cmark}] Motivated the proposed algorithm by showing
+\item[{\color{green} \cmark}] Motivated the algorithm by showing
 that the minimax value  of its value function corresponds to a predictive model
 that is both optimal and pivotal (if that models exists) or for which one can
-tune the trade-off between power and robustness. 
-
-\item[{\color{green} \cmark}]  Empirically point confirmed the effectiveness of our method on a toy example
-and a particle physics example.
+tune the trade-off between power and robustness.
 
 \end{itemize}
 
 \begin{itemize}
 \item[{\color{blue} $\Box$}] Proposed solution can be used in any situation
 where the training data may not be representative of the real data the
-predictive model will be applied to in practice. 
+predictive model will be applied to in practice.
 
 \item[{\color{blue} $\Box$}] In the scientific context, the
 presence of systematic uncertainty can be incorporated by considering a family
-of data generation processes. 
+of data generation processes.
 
-\item[{\color{blue} $\Box$}] The approach also extends to cases where independence of the predictive model with respect to
-observed random variables is desired, as in fairness for
-classification.
+\item[{\color{blue} $\Box$}] The approach extends to cases where independence of the predictive model with respect to
+observed random variables is desired, {\color{red}as in fairness for
+classification}.
 \end{itemize}
 
 
 \line(1,0){525}\\
-KC and GL are both supported through NSF ACI-1450310, additionally KC is supported through PHY-1505463 and PHY-1205376. MK is supported by the US Department of Energy (DOE) under grant DE-AC02-76SF00515 and by the SLAC Panofsky Fellowship. 
+KC and GL are both supported through NSF ACI-1450310, additionally KC is supported through PHY-1505463 and PHY-1205376 and GL through the NRB Big Data Chair. MK is supported by the US Department of Energy (DOE) under grant DE-AC02-76SF00515 and by the SLAC Panofsky Fellowship.
 \end{block}
 
 
