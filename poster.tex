@@ -69,10 +69,10 @@ differences in the distribution of the data used for training and testing. The
 majority of this work focuses on a binary domain label. Similar problems occur
 in a scientific context where there may be a continuous family of plausible data
 generation processes associated to the presence of systematic uncertainties.
-Robust inference is possible if it is based on a pivot -- a quantity whose
+Robust inference is possible if it is based on a {\color{blue}pivot -- a quantity whose
 distribution does not depend on the unknown values of the nuisance parameters
-that parametrize this family of data generation processes. {\color{red} In this work,  we
-introduce and derive theoretical results for a training procedure based on
+that parametrize this family of data generation processes}. In this work,  we
+introduce and derive theoretical results for {\color{red} a training procedure based on
 adversarial networks for enforcing the pivotal property (or, equivalently,
 fairness with respect to continuous attributes) on a predictive model.} The
 method includes a hyperparameter to control the trade-off between accuracy and
@@ -88,10 +88,11 @@ and examples from particle physics.
 \end{column}
 \begin{column}{0.48\textwidth}
 Data generating process $p(X, Y, Z)$ \\
-$x \in \mathcal{X}$ are the data \\
-$y \in \mathcal{Y}$ are the target labels \\
-$z \in \mathcal{Z}$ are the nuisance parameters \\
-\hspace{1.2cm} continuous or categorical
+- $x \in \mathcal{X}$ are the data \\
+- $y \in \mathcal{Y}$ are the target labels \\
+- $z \in \mathcal{Z}$ are continuous or categorical \\
+\hspace{1.2cm} domain labels, nuisance parameters or \\
+\hspace{1.2cm} attribute we wish to be insensitive to.
 \end{column}
 %\begin{column}{0.02\textwidth}
 %\end{column}
@@ -99,7 +100,7 @@ $z \in \mathcal{Z}$ are the nuisance parameters \\
 \textbf{\color{red} Goal}: Learn a classification/regression function $f$
 with parameters $\theta_{f}$ and minimizing a loss ${\cal L}_f(\theta_f)$ (e.g., the cross-entropy) such that
 $$p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime ).$$
-That is {\color{blue}\bf such that $f(X ; \theta_f)$ and $Z$ are independent variables}.
+This implies that {\color{blue}\bf $f(X ; \theta_f)$ and $Z$ are independent variables}.
 \end{column}
 \begin{column}{0.02\textwidth}
 \end{column}
@@ -329,6 +330,8 @@ The optimal choice of $\lambda$ should be \textcolor{red}{guided by a higher-lev
 \end{textblock}
 
 
+\vspace{-0.3cm}
+
 %% Column 3 ==================================================================
 
 \begin{textblock}{0.32}(0.662,-0.33)
@@ -342,22 +345,21 @@ The optimal choice of $\lambda$ should be \textcolor{red}{guided by a higher-lev
     \begin{center}
         \includegraphics[width=\textwidth]{figures/training.pdf}\vspace{-1em}
     \end{center}
-    {\bf Figure 3.} Toy example. Training curves for ${\cal L}_f(\theta_f)$, ${\cal L}_r(\theta_f, \theta_r)$
-    and ${\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)$.
-    Initialized with a pre-trained classifier $f$, adversarial training was performed for $200$ iterations, mini-batches of size $M=128$, $K=500$ and $\lambda=50$
+    {\bf Figure 3.} Training curves for the toy example.
+    Initialized with a pre-trained classifier $f$, adversarial training was for $200$ iterations, mini-batches of size $M=128$, $K=500$ and $\lambda=50$
 \end{minipage}
 \hspace{.05\linewidth}
 \begin{minipage}{.42\linewidth}
     \begin{center}
         \includegraphics[width=\textwidth]{figures/ams.pdf}\vspace{-1em}
     \end{center}
-        {\bf Figure 4.} Physics example. Approximate median significance as a function of the decision threshold
-        on the output of $f$. At $\lambda=10$, {\color{red} trading
-        accuracy for independence to pileup
+        {\bf Figure 4.} Physics example. Approximate median significance as a function of the threshold
+        on $f$. At $\lambda=10$, {\color{red} trading
+        accuracy for independence
         results in a net benefit in terms of statistical significance}.
 \end{minipage}
 \end{figure}
-
+\vspace{-0.5cm}
 \begin{figure}
 \centering
 \begin{minipage}{.42\linewidth}
@@ -385,27 +387,23 @@ predictive model that is independent of continuous or categorical nuisance
 parameters} by jointly training two neural networks in an adversarial fashion.
 
 \item[{\color{green} \cmark}] Motivated the algorithm by showing
-that the minimax value  of its value function corresponds to a predictive model
+that the minimax solution corresponds to a predictive model
 that is both optimal and pivotal (if that models exists) or for which one can
 tune the trade-off between power and robustness.
 
-\end{itemize}
-
-\begin{itemize}
-\item[{\color{blue} $\Box$}] Can be used in any situation
+\item[{\color{green} \cmark}] Can be used in any situation
 where the training data may not be representative of the real data the
 predictive model will be applied to in practice.
 
-\item[{\color{blue} $\Box$}] In the scientific context, the
-presence of systematic uncertainty can be incorporated by considering a family
-of data generation processes.
+\item[{\color{green} \cmark}] In a scientific context, this enables one to train predictive models that are insensitive to systematic uncertainties parametrized by continuous or categorical nuisance parameters.
 
-\item[{\color{blue} $\Box$}] The approach extends to cases where independence of the predictive model with respect to
+\item[{\color{green} \cmark}] The approach extends to cases where independence of the predictive model with respect to
 observed random variables is desired, {\color{red}as in fairness for
-classification}.
+classification}. E.g., this has been used in jet tagging (Shimmin et al, 2017) for decorrelating a model against a {\color{red} continuous} attribute.
 \end{itemize}
 
 
+\vspace{-0.7cm}
 \line(1,0){525}\\
 KC and GL are both supported through NSF ACI-1450310, additionally KC is supported through PHY-1505463 and PHY-1205376 and GL through the NRB Big Data Chair. MK is supported by the US Department of Energy (DOE) under grant DE-AC02-76SF00515 and by the SLAC Panofsky Fellowship.
 \end{block}
