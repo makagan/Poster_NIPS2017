@@ -99,7 +99,7 @@ $z \in \mathcal{Z}$ are the nuisance parameters \\
 \textbf{\color{red} Goal}: Learn a classification/regression function $f$
 with parameters $\theta_{f}$ and minimizing a loss ${\cal L}_f(\theta_f)$ (e.g., the cross-entropy) such that
 $$p(f(X ; \theta_f) = s | z ) = p(f(X ; \theta_f) = s | z^\prime ).$$
-That is {\color{blue} such that $f(X ; \theta_f)$ and $Z$ are independent variables}.
+That is {\color{blue}\bf such that $f(X ; \theta_f)$ and $Z$ are independent variables}.
 \end{column}
 \begin{column}{0.02\textwidth}
 \end{column}
@@ -110,10 +110,8 @@ That is {\color{blue} such that $f(X ; \theta_f)$ and $Z$ are independent variab
 \vspace{0.5cm}
 \begin{block}{Method \phantom{p}}
 
-Let $r := p_{\theta_r}(z | f(X;\theta_f)=s)$ be {\color{red} an adversary model} with
-parameters $\theta_r$ and loss ${\cal L}_r(\theta_f, \theta_r)$. As with
-generative adversarial networks, $f$ and $r$ are trained simultaneously, which
-is carried out by considering the value function
+Let $r := p_{\theta_r}(z | f(X;\theta_f)=s)$ be {\color{red} an adversary network} modeling the conditional distribution $Z|f(X;\theta_f)$, with
+parameters $\theta_r$ and loss ${\cal L}_r(\theta_f, \theta_r)$. As in GANs, $f$ and $r$ are trained simultaneously, by considering the value function
 \begin{align}
 E(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - {\cal L}_r(\theta_f, \theta_r)
 \end{align}
@@ -291,10 +289,10 @@ are independent variables.
 \vspace{0.2cm}
 \begin{block}{In practice\phantom{p}}
 The assumption of existence of an optimal and pivotal classifier may
-not hold because the nuisance parameter directly shapes the decision boundary.
+not hold because $Z$ directly shapes the decision boundary.
 % In this case, the lower bound is strict: $f$ can either be an optimal classifier or a
 % pivotal quantity, but not both simultaneously.
-In this situation, the value function $E$ can be rewritten  as
+However, the value function $E$ can be rewritten  as
 \begin{align}
 E_\lambda(\theta_f, \theta_r) = {\cal L}_f(\theta_f) - \lambda {\cal L}_r(\theta_f, \theta_r)
 \end{align}
@@ -302,7 +300,8 @@ where $\lambda \geq 0$ is a hyper-parameter controlling the trade-off between
 the performance of $f$ and its independence with respect to the nuisance
 parameter. \\
 - Setting $\lambda$ to a large value preferably enforces $f$ to be pivotal.\\
-- Setting $\lambda$ close to $0$ constrains $f$ to be optimal.
+- Setting $\lambda$ close to $0$ constrains $f$ to be optimal.\\
+The optimal choice of $\lambda$ should be \textcolor{red}{guided by a higher-level objective}.
 \end{block}
 
 \vspace{0.2cm}
@@ -321,7 +320,7 @@ parameter. \\
    (Middle left) Decision surface. Samples are easier to classify for values of $Z$ above $\sigma$.
    (Middle right) Decision scores with adversarial training.
       The resulting densities are now almost identical to each other, indicating only a
-      small dependency on $Z$.
+      residual dependency on $Z$.
    (Right) Adversarial
       training reshapes the decision function vertically to erase the dependency on $Z$.
 
@@ -393,7 +392,7 @@ tune the trade-off between power and robustness.
 \end{itemize}
 
 \begin{itemize}
-\item[{\color{blue} $\Box$}] Proposed solution can be used in any situation
+\item[{\color{blue} $\Box$}] Can be used in any situation
 where the training data may not be representative of the real data the
 predictive model will be applied to in practice.
 
